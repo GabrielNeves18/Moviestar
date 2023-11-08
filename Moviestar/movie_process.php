@@ -10,6 +10,7 @@
 
     $message = new Message($BASE_URL);
     $userDao = new UserDao($conn, $BASE_URL);
+    $movieDao = new MovieDao($conn, $BASE_URL);
     
     $userData = $userDao->verifyToken();
 
@@ -37,7 +38,8 @@
             $movie->description = $description;
             $movie->category = $category;
             $movie->trailer = $trailer;
-            $movie->lenght = $length;
+            $movie->length = $length;
+            $movie->users_id = $userData->id;
 
             
 
@@ -76,10 +78,8 @@
 
             } 
 
-            print_r($_POST); 
-            print_r($_FILES); 
-            exit;
-            //$movieDao->create($movie);
+
+            $movieDao->create($movie);
 
         } else {
             $message->setMessage("Você precisa adicionar o titulo, descrição e categoria","error", "back");

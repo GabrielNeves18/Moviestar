@@ -46,7 +46,7 @@
             if(in_array($image['type'], $imageTypes)){
 
                 //Checar se é jpeg
-                if(in_array($image, $jpgArray )){
+                if(in_array($image['type'], $jpgArray)){
 
                     $imageFile = imagecreatefromjpeg($image['tmp_name']);
                     
