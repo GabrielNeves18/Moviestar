@@ -24,7 +24,7 @@
             $movie = new Movie();
 
             $movie->id = $data["id"];
-            $movie->users_id = $data["title"];
+            $movie->title = $data["title"];
             $movie->description = $data["description"];
             $movie->image = $data["image"];
             $movie->trailer = $data["trailer"];
@@ -35,14 +35,31 @@
             return $movie;
         }
         public function findAll(){}
-        public function getLatesMovies(){}
+        public function getLatestMovies(){
+            $movies = [];
+
+            $stmt = $this->conn->query("SELECT * FROM movies ORDER BY id desc");
+
+            $stmt->execute();
+
+            if($stmt->rowCount() > 0 ){
+
+                $moviesArray = $stmt->fetchAll();
+                foreach($moviesArray as $movie){
+
+                    $movies[] = $this->buildMovie($movie);
+                }
+            }
+
+            return $movies;
+        }
         public function getMoviesByCategory($category){}
         public function getMoviesByUserId($id){}
         public function findbyId($id){}
         public function findByTitle($title){}
         public function create(Movie $movie){
             $stmt = $this->conn->prepare("INSERT INTO movies (title, description, image, trailer, category, length, users_id) 
-            VALUES (:title, :description, :image, :category, :length, :users_id)");
+            VALUES (:title, :description, :image, :trailer, :category, :length, :users_id)");
 
             $stmt->bindParam(":title", $movie->title);
             $stmt->bindParam(":description", $movie->description);
