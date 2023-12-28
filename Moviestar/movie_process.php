@@ -110,8 +110,37 @@
             $message->setMessage("Filme invalido","error", "index.php");
         }
 
-    }
-    else {
+    } else if ($type === "update") {
+
+        $title = filter_input(INPUT_POST, "title");
+        $description = filter_input(INPUT_POST, "description");
+        $trailer = filter_input(INPUT_POST, "trailer");
+        $category = filter_input(INPUT_POST, "category");
+        $length = filter_input(INPUT_POST, "length");
+        $id = filter_input(INPUT_POST, "id");
+
+        $movieData = $movieDao->findbyId($id);
+        
+        
+        //VERIFICA SE ENCONTROU FILME 
+        if($movieData){
+            if($movieData->users_id === $userData->id){
+                // EDIÇÃO DO FILME 
+
+                $movieData->title = $title;
+                $movieData->id = $id;
+                $movieData->length = $length;
+                $movieData->trailer = $trailer;
+                $movieData->category = $category;
+                $movieData->description = $description;
+                
+
+            } else {
+                $message->setMessage("Você precisa adicionar o titulo, descrição e categoria","error", "back");
+            }
+        }
+
+    } else {
     
         $message->setMessage("Filme invalido","error", "index.php");
     }
