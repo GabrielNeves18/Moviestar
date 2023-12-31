@@ -4,6 +4,7 @@
     //VERIFICAR SE USUARIO ESTA AUTENTICADO
     require_once("models/Movie.php");
     require_once("dao/MovieDAO.php");
+    require_once("dao/ReviewDAO.php");
 
     //PEGAR ID DO FILME
 
@@ -11,6 +12,7 @@
     $movie;
 
     $movieDao = new MovieDAO($conn, $BASE_URL);
+    $reviewDao = new ReviewDao($conn, $BASE_URL);
 
     if(empty($id)){
         $message->setMessage("O filme não foi encontrado", "error", "index.php");
@@ -37,9 +39,15 @@
         if($userData->id === $movie->users_id){
             $userOwnsMovie = true;
         }
+
+        // RESGATAR AS REVIEWS DO FILME
+        $alreadyReviewed = $reviewDao->hasAlreadyReviewed($id, $userData->id);
     }
 
     // RESGATAR AS REVIEWS DO FILME
+    $movieReviews = $reviewDao->getMoviesReview($id);
+
+
 ?>
 <div id="main-container" class="container-fluid">
     <div class="row">
@@ -51,7 +59,7 @@
                 <span class="pipe"></span>
                 <span><?= $movie->category ?></span>
                 <span class="pipe"></span>
-                <span><i class="fas fa-star"></i>9</span>
+                <span><i class="fas fa-star"></i><?= $movie->rating ?></span>
             </p>
             <iframe src="<?= $movie->trailer?>" width="580" height="315" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encryted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             <p><?= $movie->description ?></p>
@@ -94,39 +102,12 @@
             </div>
             <?php endif; ?>
             <!-- COMENTÁRIOS -->
-            <div class="col-md-12">
-                <div class="row">
-                    <div class="col-md-1">
-                        <div class="profile-image-container review-image" style="background-image: url('<?= $BASE_URL?>img/users/user.png')">
-                        </div>
-                    </div>
-                    <div class="col-md-9 author-details-container">
-                        <h4 class="author-name"><a href="#">Gabriel Teste</a></h4>
-                        <p><i class="fas fa-star"></i>9</p>
-                    </div>
-                    <div class="col-md-12">
-                        <p class="comment-title">Comentário</p>
-                        <p>Este é o comentário do usuário</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-12">
-                <div class="row">
-                    <div class="col-md-1">
-                        <div class="profile-image-container review-image" style="background-image: url('<?= $BASE_URL?>img/users/user.png')">
-                        </div>
-                    </div>
-                    <div class="col-md-9 author-details-container">
-                        <h4 class="author-name"><a href="#">Gabriel Teste</a></h4>
-                        <p><i class="fas fa-star"></i>9</p>
-                    </div>
-                    <div class="col-md-12">
-                        <p class="comment-title">Comentário</p>
-                        <p>Este é o comentário do usuário</p>
-                    </div>
-                </div>
-            </div>
-
+            <?php foreach($movieReviews as $review):?>
+                <?php require("templates/user_review.php");?>
+            <?php endforeach; ?>
+            <?php if(count($movieReviews) == 0) : ?>
+                <p class="empty-list">Não há comentários para este filme!</p>
+            <?php endif; ?>
         </div>
     </div>
 

@@ -47,36 +47,23 @@
             //UPload de imagem
 
             if(isset($_FILES["image"]) && !empty($_FILES["image"]["tmp_name"])){
-
                 $image = $_FILES["image"];
                 $imageTypes = ["image/jpeg", "image/jpg", "image/png"];
                 $jpgArray = ["image/jpeg", "image/jpg"];
-
                 //CHECANDO TIPO IMAGEM
-
                 if(in_array($image["type"], $imageTypes)){
-
                     //CHECA SE É JPEG
                     if(in_array($image["type"], $jpgArray)){
                         $imageFile = imagecreatefromjpeg($image["tmp_name"]);
                     } else {
                         $imageFile = imagecreatefrompng($image["tmp_name"]);
                     }
-
                     $imageName = $movie->imageGenerateName();
-
                     imagejpeg($imageFile, "./img/movies/" . $imageName, 100);
-
                     $movie->image = $imageName;
-
-
                 } else{
-
                     $message->setMessage("Tipo inválido !", "error", "back");
-
                 }
-
-
             } 
 
 
@@ -126,17 +113,46 @@
         if($movieData){
             if($movieData->users_id === $userData->id){
                 // EDIÇÃO DO FILME 
+                if(!empty($title) && !empty($description) && !empty($category)){
+                    $movieData->title = $title;
+                    $movieData->id = $id;
+                    $movieData->length = $length;
+                    $movieData->trailer = $trailer;
+                    $movieData->category = $category;
+                    $movieData->description = $description;
 
-                $movieData->title = $title;
-                $movieData->id = $id;
-                $movieData->length = $length;
-                $movieData->trailer = $trailer;
-                $movieData->category = $category;
-                $movieData->description = $description;
-                
+                    if(isset($_FILES["image"]) && !empty($_FILES["image"]["tmp_name"])){
+                        $image = $_FILES["image"];
+                        $imageTypes = ["image/jpeg", "image/jpg", "image/png"];
+                        $jpgArray = ["image/jpeg", "image/jpg"];
 
-            } else {
-                $message->setMessage("Você precisa adicionar o titulo, descrição e categoria","error", "back");
+                        //CHECANDO TIPO IMAGEM
+                        if(in_array($image["type"], $imageTypes)){
+                            //CHECA SE É JPEG
+                            if(in_array($image["type"], $jpgArray)){
+                                $imageFile = imagecreatefromjpeg($image["tmp_name"]);
+
+                            } else {
+                                $imageFile = imagecreatefrompng($image["tmp_name"]);
+                            }
+                            
+                            $movie = new Movie();
+
+                            $imageName = $movie->imageGenerateName();
+                            imagejpeg($imageFile, "./img/movies/" . $imageName, 100);
+                            $movieData->image = $imageName;
+
+                        } else{
+                            $message->setMessage("Tipo inválido !", "error", "back");
+                        }
+                    }
+                    
+                    $movieDao->update($movieData);
+
+                } else {
+                    $message->setMessage("Você precisa adicionar o titulo, descrição e categoria","error", "back");
+                }
+
             }
         }
 
